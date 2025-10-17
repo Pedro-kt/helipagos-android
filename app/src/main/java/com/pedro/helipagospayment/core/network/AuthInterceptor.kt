@@ -1,4 +1,4 @@
-package com.pedro.helipagospayment.network
+package com.pedro.helipagospayment.core.network
 
 import okhttp3.Interceptor
 import okhttp3.Response

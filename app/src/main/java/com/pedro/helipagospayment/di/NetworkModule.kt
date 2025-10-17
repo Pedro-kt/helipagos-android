@@ -2,8 +2,8 @@ package com.pedro.helipagospayment.di
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.pedro.helipagospayment.BuildConfig
-import com.pedro.helipagospayment.features.paymentrequest.data.api.PaymentApi
-import com.pedro.helipagospayment.network.AuthInterceptor
+import com.pedro.helipagospayment.features.paymentrequests.data.api.PaymentApi
+import com.pedro.helipagospayment.core.network.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -12,7 +12,6 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import javax.inject.Singleton
 
