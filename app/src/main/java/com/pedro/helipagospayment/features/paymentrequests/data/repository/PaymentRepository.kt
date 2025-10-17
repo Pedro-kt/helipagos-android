@@ -1,6 +1,6 @@
-package com.pedro.helipagospayment.features.paymentrequest.data.repository
+package com.pedro.helipagospayment.features.paymentrequests.data.repository
 
-import com.pedro.helipagospayment.features.paymentrequest.data.model.PaymentsResponseDto
+import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentsResponseDto
 
 interface PaymentRepository {
     suspend fun getPayments(): Result<PaymentsResponseDto>

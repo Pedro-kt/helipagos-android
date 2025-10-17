@@ -1,4 +1,4 @@
-package com.pedro.helipagospayment.features.paymentrequest.ui.detail
+package com.pedro.helipagospayment.features.paymentrequests.ui.detail
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize

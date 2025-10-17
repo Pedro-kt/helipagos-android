@@ -1,4 +1,4 @@
-package com.pedro.helipagospayment.features.paymentrequest.data.model
+package com.pedro.helipagospayment.features.paymentrequests.data.model
 
 import kotlinx.serialization.Serializable
 

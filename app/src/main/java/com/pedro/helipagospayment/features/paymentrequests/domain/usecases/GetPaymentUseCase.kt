@@ -1,6 +1,6 @@
-package com.pedro.helipagospayment.features.paymentrequest.domain.usecases
+package com.pedro.helipagospayment.features.paymentrequests.domain.usecases
 
-import com.pedro.helipagospayment.features.paymentrequest.data.repository.PaymentRepository
+import com.pedro.helipagospayment.features.paymentrequests.data.repository.PaymentRepository
 import javax.inject.Inject
 
 class GetPaymentUseCase @Inject constructor(

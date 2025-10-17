@@ -1,6 +1,6 @@
-package com.pedro.helipagospayment.features.paymentrequest.data.api
+package com.pedro.helipagospayment.features.paymentrequests.data.api
 
-import com.pedro.helipagospayment.features.paymentrequest.data.model.PaymentResponseDto
+import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
 import retrofit2.http.POST
 
 
