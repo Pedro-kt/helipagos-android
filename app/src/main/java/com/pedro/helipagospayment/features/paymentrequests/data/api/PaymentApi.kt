@@ -11,7 +11,7 @@ interface PaymentApi {
     @POST("api/solicitud_pago/v1/get_solicitud_pago")
     suspend fun getPayments(): List<PaymentResponseDto>
 
-    @POST("api/solicitud_pago/v1/get_solicitud_pago/{id}")
+    @POST("api/solicitud_pago/v1/get_solicitud_pago")
     suspend fun getPaymentDetail(
         @Query("id") paymentId: Int
     ): List<PaymentResponseDto>

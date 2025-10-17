@@ -1,5 +1,6 @@
 package com.pedro.helipagospayment.navigation
 
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -18,12 +19,10 @@ fun AppNavigation(
         navController = navController,
         startDestination = Destinations.PAYMENT_LIST
     ) {
-        composable(
-            Destinations.PAYMENT_LIST
-        ) {
+        composable(Destinations.PAYMENT_LIST) {
             PaymentRequestsScreen(
                 onPaymentClick = { paymentId ->
-                    navController.navigate("payment_detail/$paymentId")
+                    navController.navigate(Destinations.paymentDetail(paymentId))
                 }
             )
         }
@@ -34,11 +33,8 @@ fun AppNavigation(
                     type = NavType.IntType
                 }
             )
-        ) { backStackEntry ->
-            val paymentId = backStackEntry.arguments!!.getInt("paymentId")
-            PaymentDetailScreen(
-                paymentId
-            )
+        ) {
+            PaymentDetailScreen()
         }
         composable(
             route = Destinations.PAYMENT_CREATE
