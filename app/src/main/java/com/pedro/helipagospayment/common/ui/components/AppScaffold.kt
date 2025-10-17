@@ -17,38 +17,38 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.pedro.helipagospayment.navigation.AppNavigation
+import com.pedro.helipagospayment.navigation.Destinations
+import com.pedro.helipagospayment.utils.navigationItems
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppScaffold() {
 
+    val navController = rememberNavController()
+    val currentRoute = navController.currentBackStackEntryAsState().value?.destination?.route
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text("Helipagos Payment") }
+            TopAppBarComponent(
+                navController = navController,
+                currentRoute = currentRoute
             )
         },
         bottomBar = {
-            NavigationBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-            ) {
-                NavigationBarItem(
-                    icon = {
-                        Icon(Icons.Default.Menu, contentDescription = "Lista de pagos")
-                    },
-                    label = { Text("Actividad") },
-                    selected = true,
-                    onClick = {
-
-                    }
+            if (currentRoute in navigationItems.map { it.route }) {
+                BottomNavigationBar(
+                    navController = navController,
+                    currentRoute = currentRoute
                 )
             }
         }
     ) { innerPadding ->
         Box(modifier = Modifier.padding(innerPadding)) {
-            AppNavigation()
+            AppNavigation(navController = navController)
         }
     }
 }

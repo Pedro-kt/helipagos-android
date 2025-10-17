@@ -12,7 +12,7 @@ import com.pedro.helipagospayment.features.paymentrequests.ui.list.PaymentReques
 
 @Composable
 fun AppNavigation(
-    navController: NavHostController = rememberNavController()
+    navController: NavHostController
 ) {
     NavHost(
         navController = navController,

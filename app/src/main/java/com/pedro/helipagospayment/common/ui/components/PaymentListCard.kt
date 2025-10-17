@@ -18,17 +18,15 @@ import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentRes
 @Composable
 fun PaymentItemCard(
     payment: PaymentResponseDto,
-    //onClick: () -> Unit,
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-        /*
         onClick = {
             onClick()
         }
-         */
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Text(
