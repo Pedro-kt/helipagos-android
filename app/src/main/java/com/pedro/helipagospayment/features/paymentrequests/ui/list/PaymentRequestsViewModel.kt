@@ -1,8 +1,8 @@
-package com.pedro.helipagospayment.features.paymentrequest.ui.list
+package com.pedro.helipagospayment.features.paymentrequests.ui.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.pedro.helipagospayment.features.paymentrequest.domain.usecases.GetPaymentUseCase
+import com.pedro.helipagospayment.features.paymentrequests.domain.usecases.GetPaymentUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

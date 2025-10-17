@@ -1,6 +1,6 @@
-package com.pedro.helipagospayment.features.paymentrequest.ui.list
+package com.pedro.helipagospayment.features.paymentrequests.ui.list
 
-import com.pedro.helipagospayment.features.paymentrequest.data.model.PaymentsResponseDto
+import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentsResponseDto
 
 sealed class PaymentRequestsUiState {
     object Loading : PaymentRequestsUiState()

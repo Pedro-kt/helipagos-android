@@ -5,13 +5,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import com.pedro.helipagospayment.features.paymentrequest.ui.list.PaymentRequestsScreen
+import com.pedro.helipagospayment.common.ui.components.AppScaffold
+import com.pedro.helipagospayment.navigation.AppNavigation
 import com.pedro.helipagospayment.ui.theme.HelipagosPaymentTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -22,9 +19,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             HelipagosPaymentTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    PaymentRequestsScreen()
-                }
+                AppScaffold()
             }
         }
     }
