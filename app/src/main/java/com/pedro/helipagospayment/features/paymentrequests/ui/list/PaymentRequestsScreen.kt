@@ -57,11 +57,9 @@ fun PaymentRequestsScreen(
                             items(responseDto.payments) { payment ->
                                 PaymentItemCard(
                                     payment,
-                                    /*
                                     onClick = {
-                                        onPaymentClick(payment.id_sp)
+                                        onPaymentClick(payment.idSp)
                                     }
-                                     */
                                 )
                             }
                         }

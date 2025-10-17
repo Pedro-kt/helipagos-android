@@ -35,13 +35,13 @@ fun PaymentItemCard(
             )
 
             Spacer(modifier = Modifier.height(4.dp))
-            Text(text = "Estado: ${payment.estado_pago ?: "Desconocido"}")
+            Text(text = "Estado: ${payment.estadoPago ?: "Desconocido"}")
             Text(text = "Importe: $${payment.importe}")
-            Text(text = "Medio: ${payment.medio_pago ?: "N/A"}")
+            Text(text = "Medio: ${payment.medioPago ?: "N/A"}")
 
             Spacer(modifier = Modifier.height(4.dp))
             Text(
-                text = "Fecha: ${payment.fecha_pago ?: "N/A"}",
+                text = "Fecha: ${payment.fechaPago ?: "N/A"}",
                 style = MaterialTheme.typography.bodySmall
             )
         }

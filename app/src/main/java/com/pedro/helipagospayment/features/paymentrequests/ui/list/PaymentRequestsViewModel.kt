@@ -6,6 +6,7 @@ import com.pedro.helipagospayment.features.paymentrequests.domain.usecases.GetPa
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -15,13 +16,15 @@ class PaymentRequestsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<PaymentRequestsUiState>(PaymentRequestsUiState.Loading)
-    val uiState: StateFlow<PaymentRequestsUiState> = _uiState
+    val uiState: StateFlow<PaymentRequestsUiState> = _uiState.asStateFlow() // ahora esto se expone como ReadOnly
+
 
     init {
         loadPayments()
     }
 
-    private fun loadPayments() {
+    // Cambie esta funcion de privada a publica para lograr el Retry desde la UI
+    fun loadPayments() {
         viewModelScope.launch {
             _uiState.value = PaymentRequestsUiState.Loading
 
@@ -32,5 +35,9 @@ class PaymentRequestsViewModel @Inject constructor(
                 _uiState.value = PaymentRequestsUiState.Error(e.message ?: "Unknown error")
             }
         }
+    }
+
+    fun retry() {
+        loadPayments()
     }
 }

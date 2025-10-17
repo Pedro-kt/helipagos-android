@@ -13,7 +13,6 @@ fun PaymentDetailScreen(
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        Text(text = "Payment Detail Screen")
         Text(text = "Payment ID: $paymentId")
     }
 }
