@@ -16,7 +16,7 @@ class PaymentRequestsViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<PaymentRequestsUiState>(PaymentRequestsUiState.Loading)
-    val uiState: StateFlow<PaymentRequestsUiState> = _uiState.asStateFlow() // ahora esto se expone como ReadOnly
+    val uiState: StateFlow<PaymentRequestsUiState> = _uiState.asStateFlow()
 
 
     init {
