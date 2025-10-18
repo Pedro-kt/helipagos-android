@@ -8,6 +8,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.pedro.helipagospayment.features.paymentrequests.ui.create.CreatePaymentScreen
 import com.pedro.helipagospayment.features.paymentrequests.ui.detail.PaymentDetailScreen
 import com.pedro.helipagospayment.features.paymentrequests.ui.list.PaymentRequestsScreen
 
@@ -23,6 +24,9 @@ fun AppNavigation(
             PaymentRequestsScreen(
                 onPaymentClick = { paymentId ->
                     navController.navigate(Destinations.paymentDetail(paymentId))
+                },
+                onClickButton = {
+                    navController.navigate(Destinations.PAYMENT_CREATE)
                 }
             )
         }
@@ -39,7 +43,7 @@ fun AppNavigation(
         composable(
             route = Destinations.PAYMENT_CREATE
         ) {
-
+            CreatePaymentScreen(navController = navController)
         }
     }
 }
