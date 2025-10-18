@@ -39,7 +39,12 @@ fun TopAppBarComponent(
         }
         Destinations.PAYMENT_CREATE -> {
             TopAppBar(
-                title = { Text("Crear pago") }
+                title = { Text("Crear Solicitud de Pago") },
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "volver atras")
+                    }
+                }
             )
         }
     }
