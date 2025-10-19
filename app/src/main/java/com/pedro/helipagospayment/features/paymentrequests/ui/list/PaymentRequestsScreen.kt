@@ -33,6 +33,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -54,28 +59,64 @@ fun PaymentRequestsScreen(
 ) {
     val paymentsLazyPagingItems = viewModel.paymentsPagingData.collectAsLazyPagingItems()
 
+    var isManualRefreshing by remember { mutableStateOf(false) }
+
+    val isLoading = paymentsLazyPagingItems.loadState.refresh is LoadState.Loading
+    val isError = paymentsLazyPagingItems.loadState.refresh is LoadState.Error
+    val isEmpty = paymentsLazyPagingItems.itemCount == 0
+
+    val hasLoadedOnce = remember { mutableStateOf(false) }
+
+    LaunchedEffect(isLoading) {
+        if (!isLoading) {
+            isManualRefreshing = false
+            hasLoadedOnce.value = true
+        }
+    }
+
     Box(modifier = Modifier.fillMaxSize()) {
         PullToRefreshBox(
-            isRefreshing = paymentsLazyPagingItems.loadState.refresh is LoadState.Loading,
-            onRefresh = { paymentsLazyPagingItems.refresh() }
+            isRefreshing = isManualRefreshing,
+            onRefresh = {
+                isManualRefreshing = true
+                paymentsLazyPagingItems.refresh()
+            }
         ) {
             when {
 
-                paymentsLazyPagingItems.loadState.refresh is LoadState.Loading &&
-                        paymentsLazyPagingItems.itemCount == 0 -> {
+                isLoading && isEmpty && !hasLoadedOnce.value -> {
                     LoadingState()
                 }
 
-                paymentsLazyPagingItems.loadState.refresh is LoadState.Error -> {
+                isError && !isManualRefreshing -> {
                     val error = (paymentsLazyPagingItems.loadState.refresh as LoadState.Error).error
-                    ErrorState(
-                        message = error.message ?: "Error al cargar",
-                        onRetry = { paymentsLazyPagingItems.retry() }
-                    )
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        item {
+                            ErrorState(
+                                message = error.message ?: "Error al cargar",
+                                onRetry = {
+                                    isManualRefreshing = true
+                                    paymentsLazyPagingItems.retry()
+                                }
+                            )
+                        }
+                    }
                 }
 
-                paymentsLazyPagingItems.itemCount == 0 -> {
-                    EmptyState()
+                !isLoading && isEmpty && hasLoadedOnce.value -> {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        item {
+                            EmptyState()
+                        }
+                    }
                 }
 
                 else -> {
@@ -99,6 +140,7 @@ fun PaymentRequestsScreen(
         )
     }
 }
+
 @Composable
 private fun PaymentListPaged(
     paymentsLazyPagingItems: LazyPagingItems<PaymentResponseDto>,
@@ -112,8 +154,11 @@ private fun PaymentListPaged(
             bottom = 100.dp
         )
     ) {
-        item {
-            PaymentSummaryHeader(count = paymentsLazyPagingItems.itemCount)
+
+        if (paymentsLazyPagingItems.itemCount > 0) {
+            item {
+                PaymentSummaryHeader(count = paymentsLazyPagingItems.itemCount)
+            }
         }
 
         items(
