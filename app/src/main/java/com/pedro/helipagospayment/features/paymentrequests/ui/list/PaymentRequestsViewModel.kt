@@ -16,7 +16,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PaymentRequestsViewModel @Inject constructor(
-    private val getPaymentsPagedUseCase: GetPaymentsPagedUseCase
+    getPaymentsPagedUseCase: GetPaymentsPagedUseCase
 ) : ViewModel() {
 
     val paymentsPagingData: Flow<PagingData<PaymentResponseDto>> =
