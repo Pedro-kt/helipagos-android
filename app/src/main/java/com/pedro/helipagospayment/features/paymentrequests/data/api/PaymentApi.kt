@@ -5,7 +5,6 @@ import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaym
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
 import retrofit2.http.Body
 import retrofit2.http.POST
-import retrofit2.http.Path
 import retrofit2.http.Query
 
 
