@@ -29,6 +29,10 @@ mockk = "1.13.11"
 coroutinesTest = "1.8.1"
 turbine = "1.1.0"
 
+# Paging 3
+paging = "3.3.0"
+pagingCompose = "3.3.0"
+
 [libraries]
 # Core
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -73,6 +77,10 @@ navigation-compose = { group = "androidx.navigation", name = "navigation-compose
 mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
 kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
 turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+
+# Paging 3
+paging-runtime = { group = "androidx.paging", name = "paging-runtime", version.ref = "paging" }
+paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "pagingCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
