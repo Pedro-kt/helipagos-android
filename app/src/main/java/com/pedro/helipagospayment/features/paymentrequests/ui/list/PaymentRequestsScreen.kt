@@ -167,20 +167,23 @@ private fun PaymentList(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 8.dp),
+                        .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 100.dp),
                     colors = CardDefaults.cardColors(
                         containerColor = MaterialTheme.colorScheme.errorContainer
                     )
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text(
-                            text = "Error al cargar más solicitudes",
+                            text = "Error al cargar más solicitudes, por favor intente nuevamente",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onErrorContainer
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            textAlign = TextAlign.Center
                         )
                         TextButton(onClick = { paymentsLazyPagingItems.retry() }) {
                             Icon(
@@ -243,13 +246,6 @@ private fun ErrorState(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.error
-                )
-
                 Text(
                     text = "Error al cargar",
                     style = MaterialTheme.typography.titleLarge,
@@ -258,7 +254,7 @@ private fun ErrorState(
                 )
 
                 Text(
-                    text = message,
+                    text = "Algo a fallado mientras cargabamos las solicitudes de pago, por favor vuelva a intentar",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onErrorContainer,
                     textAlign = TextAlign.Center

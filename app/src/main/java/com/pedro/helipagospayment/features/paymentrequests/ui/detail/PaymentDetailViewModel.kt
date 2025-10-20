@@ -45,8 +45,4 @@ class PaymentDetailViewModel @Inject constructor(
             )
         }
     }
-
-    fun retry() {
-        loadPaymentDetail()
-    }
 }
