@@ -3,7 +3,6 @@ package com.pedro.helipagospayment.di
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.pedro.helipagospayment.BuildConfig
 import com.pedro.helipagospayment.features.paymentrequests.data.api.PaymentApi
-import com.pedro.helipagospayment.core.network.AuthInterceptor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,11 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.MailOutline
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.outlined.Email
 import androidx.compose.material3.Button
@@ -28,7 +25,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
@@ -58,13 +54,11 @@ fun PaymentRequestsScreen(
     onClickButton: () -> Unit
 ) {
     val paymentsLazyPagingItems = viewModel.paymentsPagingData.collectAsLazyPagingItems()
-
     var isManualRefreshing by remember { mutableStateOf(false) }
 
     val isLoading = paymentsLazyPagingItems.loadState.refresh is LoadState.Loading
     val isError = paymentsLazyPagingItems.loadState.refresh is LoadState.Error
     val isEmpty = paymentsLazyPagingItems.itemCount == 0
-
     val hasLoadedOnce = remember { mutableStateOf(false) }
 
     LaunchedEffect(isLoading) {
@@ -83,44 +77,27 @@ fun PaymentRequestsScreen(
             }
         ) {
             when {
-
                 isLoading && isEmpty && !hasLoadedOnce.value -> {
                     LoadingState()
                 }
 
                 isError && !isManualRefreshing -> {
                     val error = (paymentsLazyPagingItems.loadState.refresh as LoadState.Error).error
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        item {
-                            ErrorState(
-                                message = error.message ?: "Error al cargar",
-                                onRetry = {
-                                    isManualRefreshing = true
-                                    paymentsLazyPagingItems.retry()
-                                }
-                            )
+                    ErrorState(
+                        message = error.message ?: "Error al cargar",
+                        onRetry = {
+                            isManualRefreshing = true
+                            paymentsLazyPagingItems.retry()
                         }
-                    }
+                    )
                 }
 
                 !isLoading && isEmpty && hasLoadedOnce.value -> {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        item {
-                            EmptyState()
-                        }
-                    }
+                    EmptyState()
                 }
 
                 else -> {
-                    PaymentListPaged(
+                    PaymentList(
                         paymentsLazyPagingItems = paymentsLazyPagingItems,
                         onPaymentClick = onPaymentClick
                     )
@@ -132,35 +109,22 @@ fun PaymentRequestsScreen(
             onClick = onClickButton,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 50.dp, end = 20.dp),
+                .padding(bottom = 32.dp, end = 16.dp),
             icon = { Icon(Icons.Default.Add, contentDescription = "Crear solicitud") },
-            text = { Text("Nueva Solicitud") },
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            text = { Text("Nueva Solicitud") }
         )
     }
 }
 
 @Composable
-private fun PaymentListPaged(
+private fun PaymentList(
     paymentsLazyPagingItems: LazyPagingItems<PaymentResponseDto>,
     onPaymentClick: (Int) -> Unit
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        contentPadding = PaddingValues(
-            top = 8.dp,
-            bottom = 100.dp
-        )
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
-
-        if (paymentsLazyPagingItems.itemCount > 0) {
-            item {
-                PaymentSummaryHeader(count = paymentsLazyPagingItems.itemCount)
-            }
-        }
-
         items(
             count = paymentsLazyPagingItems.itemCount,
             key = { index -> paymentsLazyPagingItems[index]?.idSp ?: index }
@@ -177,67 +141,62 @@ private fun PaymentListPaged(
             item {
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
+                        .fillMaxWidth(),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(modifier = Modifier.size(32.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            strokeWidth = 2.dp
+                        )
+                        Text(
+                            text = "Cargando más...",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
                 }
             }
         }
 
         if (paymentsLazyPagingItems.loadState.append is LoadState.Error) {
             item {
-                Box(
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
+                        .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 100.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    )
                 ) {
-                    TextButton(onClick = { paymentsLazyPagingItems.retry() }) {
-                        Text("Error al cargar más. Reintentar")
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = "Error al cargar más solicitudes, por favor intente nuevamente",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onErrorContainer,
+                            textAlign = TextAlign.Center
+                        )
+                        TextButton(onClick = { paymentsLazyPagingItems.retry() }) {
+                            Icon(
+                                imageVector = Icons.Default.Refresh,
+                                contentDescription = null,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text("Reintentar")
+                        }
                     }
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun PaymentSummaryHeader(count: Int) {
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        color = MaterialTheme.colorScheme.secondaryContainer,
-        shape = RoundedCornerShape(12.dp)
-    ) {
-
-        Row(
-            modifier = Modifier.padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column {
-                Text(
-                    text = "Total de solicitudes",
-                    style = MaterialTheme.typography.labelMedium,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-                Text(
-                    text = count.toString(),
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSecondaryContainer
-                )
-            }
-
-            Icon(
-                imageVector = Icons.Default.MailOutline,
-                contentDescription = null,
-                modifier = Modifier.size(40.dp),
-                tint = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f)
-            )
         }
     }
 }
@@ -273,7 +232,7 @@ private fun ErrorState(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(32.dp),
         contentAlignment = Alignment.Center
     ) {
         Card(
@@ -287,13 +246,6 @@ private fun ErrorState(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = null,
-                    modifier = Modifier.size(64.dp),
-                    tint = MaterialTheme.colorScheme.error
-                )
-
                 Text(
                     text = "Error al cargar",
                     style = MaterialTheme.typography.titleLarge,
@@ -302,7 +254,7 @@ private fun ErrorState(
                 )
 
                 Text(
-                    text = message,
+                    text = "Algo a fallado mientras cargabamos las solicitudes de pago, por favor vuelva a intentar",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onErrorContainer,
                     textAlign = TextAlign.Center
@@ -355,7 +307,7 @@ private fun EmptyState() {
             )
 
             Text(
-                text = "Crea tu primera solicitud de pago\npresionando el botón inferior",
+                text = "Crea tu primera solicitud de pago\npresionando el botón +",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 textAlign = TextAlign.Center

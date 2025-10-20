@@ -3,15 +3,13 @@ package com.pedro.helipagospayment.features.paymentrequests.data.api
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentRequestDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentResponseDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
+import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentsPagedResponseDto
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 import retrofit2.http.Query
 
-
 interface PaymentApi {
-
-    @POST("api/solicitud_pago/v1/get_solicitud_pago")
-    suspend fun getPayments(): List<PaymentResponseDto>
 
     @POST("api/solicitud_pago/v1/get_solicitud_pago")
     suspend fun getPaymentDetail(
@@ -22,4 +20,10 @@ interface PaymentApi {
     suspend fun createPayment(
         @Body request: CreatePaymentRequestDto
     ): CreatePaymentResponseDto
+
+    @GET("api/solicitud_pago/v1/page/solicitud_pago")
+    suspend fun getPaymentsPaged(
+        @Query("pageNumber") pageNumber: Int,
+        @Query("pageSize") pageSize: Int
+    ) : PaymentsPagedResponseDto
 }
