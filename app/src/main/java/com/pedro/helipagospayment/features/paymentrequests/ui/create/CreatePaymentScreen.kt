@@ -98,10 +98,6 @@ fun CreatePaymentScreen(
         contentPadding = PaddingValues(16.dp),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        item {
-            CreatePaymentHeader()
-
-        }
 
         item {
             Card(
@@ -222,24 +218,10 @@ fun CreatePaymentScreen(
                         )
                     }
                 )
+
                 else -> {}
             }
         }
-    }
-}
-
-@Composable
-private fun CreatePaymentHeader() {
-    Column(
-        modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "Complete los datos para generar una nueva solicitud de pago",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
     }
 }
 

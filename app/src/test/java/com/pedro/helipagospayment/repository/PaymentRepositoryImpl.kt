@@ -1,5 +1,6 @@
 package com.pedro.helipagospayment.repository
 
+import androidx.paging.PagingData
 import com.pedro.helipagospayment.features.paymentrequests.data.api.PaymentApi
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentRequestDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentResponseDto
@@ -13,9 +14,15 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.runTest
+import okhttp3.ResponseBody.Companion.toResponseBody
 import org.junit.Before
 import org.junit.Test
+import retrofit2.HttpException
+import retrofit2.Response
+import java.io.IOException
+import java.net.SocketTimeoutException
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentRepositoryImplTest {
@@ -28,150 +35,182 @@ class PaymentRepositoryImplTest {
         repository = PaymentRepositoryImpl(api)
     }
 
-    // metodo getPaymentDetail
+    // Tests para getPaymentDetail
 
     @Test
     fun `getPaymentDetail devuelve resultado exitoso cuando hay datos`() = runTest {
-        // given
-        val paymentId = 1
+        // Given
+        val paymentId = 679841
         val fakePayment = createFakePayment(paymentId)
         coEvery { api.getPaymentDetail(paymentId) } returns listOf(fakePayment)
 
-        // when
+        // When
         val result = repository.getPaymentDetail(paymentId)
 
-        // then
+        // Then
         assertTrue(result.isSuccess)
         result.onSuccess { payment ->
             assertEquals(paymentId, payment.idSp)
             assertEquals("Pago test $paymentId", payment.descripcion)
+            assertEquals("GENERADA", payment.estadoPago)
         }
         coVerify(exactly = 1) { api.getPaymentDetail(paymentId) }
     }
 
     @Test
     fun `getPaymentDetail devuelve error cuando lista esta vacia`() = runTest {
-        // given
-        val paymentId = 999
+        // Given
+        val paymentId = 999999
         coEvery { api.getPaymentDetail(paymentId) } returns emptyList()
 
-        // when
+        // When
         val result = repository.getPaymentDetail(paymentId)
 
-        // then
+        // Then
         assertTrue(result.isFailure)
-        assertEquals("Payment not found", result.exceptionOrNull()?.message)
+        result.onFailure { exception ->
+            assertEquals("Payment not found", exception.message)
+        }
         coVerify(exactly = 1) { api.getPaymentDetail(paymentId) }
     }
 
     @Test
-    fun `getPaymentDetail devuelve error cuando API falla`() = runTest {
-        // given
+    fun `getPaymentDetail devuelve error cuando API falla con excepcion`() = runTest {
+        // Given
         val paymentId = 1
-        val exception = Exception("Network error")
+        val exception = IOException("Network timeout")
         coEvery { api.getPaymentDetail(paymentId) } throws exception
 
-        // when
+        // When
         val result = repository.getPaymentDetail(paymentId)
 
-        // then
+        // Then
         assertTrue(result.isFailure)
-        assertEquals("Network error", result.exceptionOrNull()?.message)
+        result.onFailure { error ->
+            assertEquals("Network timeout", error.message)
+            assertTrue(error is IOException)
+        }
         coVerify(exactly = 1) { api.getPaymentDetail(paymentId) }
     }
 
-    // metodo createPayment
+    // Tests para createPayment
 
     @Test
-    fun `createPayment devuelve resultado exitoso`() = runTest {
-        // given
+    fun `createPayment devuelve resultado exitoso con todos los datos`() = runTest {
+        // Given
         val request = createFakeCreateRequest()
         val response = CreatePaymentResponseDto(
-            idSp = 1,
-            idCliente = 1,
+            idSp = 679842,
+            idCliente = 5000,
             estado = "GENERADA",
-            referenciaExterna = "1933810",
-            fechaCreacion = "2025-10-19",
+            referenciaExterna = "REF-123",
+            fechaCreacion = "2025-10-20",
             descripcion = "Test payment",
-            codigoBarra = "123456789",
+            codigoBarra = "139000000050000067984200001000025300000123456789",
             idUrl = "abc123",
-            checkoutUrl = "https://checkout.example.com",
-            shortUrl = "https://short.url",
+            checkoutUrl = "https://checkout.helipagos.com/abc123",
+            shortUrl = "https://hpg.link/abc123",
             fechaVencimiento = "2025-12-31",
             importe = 10000
         )
         coEvery { api.createPayment(request) } returns response
 
-        // when
+        // When
         val result = repository.createPayment(request)
 
-        // then
+        // Then
         assertTrue(result.isSuccess)
         result.onSuccess { created ->
-            assertEquals(1, created.idSp)
+            assertEquals(679842, created.idSp)
             assertEquals("GENERADA", created.estado)
-            assertEquals("1933810", created.referenciaExterna)
+            assertEquals("REF-123", created.referenciaExterna)
+            assertEquals(10000, created.importe)
+            assertNotNull(created.checkoutUrl)
+            assertNotNull(created.codigoBarra)
         }
         coVerify(exactly = 1) { api.createPayment(request) }
     }
 
     @Test
-    fun `createPayment devuelve error cuando API falla`() = runTest {
-        // given
+    fun `createPayment devuelve error cuando API retorna 400`() = runTest {
+        // Given
         val request = createFakeCreateRequest()
-        val exception = Exception("Server error 500")
+        val exception = HttpException(
+            Response.error<Any>(
+                400,
+                "Bad request".toResponseBody(null)
+            )
+        )
         coEvery { api.createPayment(request) } throws exception
 
-        // when
+        // When
         val result = repository.createPayment(request)
 
-        // then
+        // Then
         assertTrue(result.isFailure)
-        assertEquals("Server error 500", result.exceptionOrNull()?.message)
+        result.onFailure { error ->
+            assertTrue(error is HttpException)
+        }
         coVerify(exactly = 1) { api.createPayment(request) }
     }
 
-    // metodo getPaymentsPaged
-
     @Test
-    fun `getPaymentsPaged devuelve Flow de PagingData`() = runTest {
-        // given
-        val fakePayments = listOf(createFakePayment(1), createFakePayment(2))
-        coEvery { api.getPayments() } returns fakePayments
+    fun `createPayment devuelve error cuando hay problema de red`() = runTest {
+        // Given
+        val request = createFakeCreateRequest()
+        val exception = SocketTimeoutException("Connection timeout")
+        coEvery { api.createPayment(request) } throws exception
 
-        // when
-        val pagingDataFlow = repository.getPaymentsPaged()
+        // When
+        val result = repository.createPayment(request)
 
-        // then
-        assertNotNull(pagingDataFlow)
-        // el Flow existe y puede ser observado
+        // Then
+        assertTrue(result.isFailure)
+        result.onFailure { error ->
+            assertTrue(error is SocketTimeoutException)
+            assertEquals("Connection timeout", error.message)
+        }
+        coVerify(exactly = 1) { api.createPayment(request) }
     }
 
-    // auxiliares para crear objetos falsos
+    // Tests para getPaymentsPaged
+
+    @Test
+    fun `getPaymentsPaged devuelve Flow de PagingData correctamente`() = runTest {
+        // When
+        val pagingDataFlow = repository.getPaymentsPaged()
+
+        // Then
+        assertNotNull(pagingDataFlow)
+        // Verificamos que es un Flow válido
+        assertTrue(pagingDataFlow is Flow<PagingData<PaymentResponseDto>>)
+    }
+
+    // Helpers
 
     private fun createFakePayment(id: Int) = PaymentResponseDto(
         idSp = id,
         descripcion = "Pago test $id",
         estadoPago = "GENERADA",
-        importe = 100.0 * id,
+        importe = 25300.0,
         medioPago = null,
         fechaPago = null,
-        fechaCreacion = "2025-10-19",
-        fechaVencimiento = "2025-12-31",
-        referenciaExterna = "REF-$id",
-        codigoBarra = null,
+        fechaCreacion = "2025-10-20 11:55:57",
+        fechaVencimiento = "2025-10-28",
+        referenciaExterna = "TEST",
+        codigoBarra = "139000000050000067984100001000025300000123456022",
         fechaAcreditacion = null,
-        referenciaExterna2 = null,
+        referenciaExterna2 = "TEST",
         importeVencido = null,
         cuotas = null,
-        fechaActualizacion = "2025-10-19",
-        segundaFechaVencimiento = null,
+        fechaActualizacion = "2025-10-20",
+        segundaFechaVencimiento = "2025-10-30",
         checkoutUrl = null,
         emailPagador = null,
         importePagado = null
     )
 
-    private fun createFakeCreateRequest(ref: String = "REF123") = CreatePaymentRequestDto(
+    private fun createFakeCreateRequest(ref: String = "REF-123") = CreatePaymentRequestDto(
         importe = 10000,
         descripcion = "Test payment",
         referenciaExterna = ref,
