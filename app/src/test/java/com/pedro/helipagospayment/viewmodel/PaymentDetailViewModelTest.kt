@@ -3,6 +3,7 @@ package com.pedro.helipagospayment.viewmodel
 import androidx.lifecycle.SavedStateHandle
 import app.cash.turbine.test
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
+import com.pedro.helipagospayment.features.paymentrequests.domain.model.PaymentResponse
 import com.pedro.helipagospayment.features.paymentrequests.domain.usecases.GetPaymentDetailUseCase
 import com.pedro.helipagospayment.features.paymentrequests.ui.detail.PaymentDetailUiState
 import com.pedro.helipagospayment.features.paymentrequests.ui.detail.PaymentDetailViewModel
@@ -17,6 +18,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
+import kotlin.Int
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class PaymentDetailViewModelTest {
@@ -105,14 +107,24 @@ class PaymentDetailViewModelTest {
     }
 }
 
-private fun paymentResponseFake(paymentId: Int) = PaymentResponseDto(
-    idSp = paymentId,
-    descripcion = "",
-    estadoPago = "",
-    importe = 100.00,
-    medioPago = null,
-    fechaPago = null,
-    fechaCreacion = "",
-    fechaVencimiento = "",
-    referenciaExterna = ""
+private fun paymentResponseFake(paymentId: Int) = PaymentResponse(
+    idSp = 1230,
+    estadoPago = "Pendiente",
+    fechaPago = "2025-11-30",
+    medioPago = "Visa",
+    importePagado = 0.0,
+    descripcion = "TEST",
+    importe = 0.0,
+    referenciaExterna = "343930",
+    codigoBarra = "644738325",
+    fechaAcreditacion = "2025-11-31",
+    referenciaExterna2 = "21553",
+    fechaVencimiento = "2025-12-30",
+    importeVencido = 0.0,
+    fechaCreacion = "2025-11-10",
+    cuotas = 1,
+    fechaActualizacion = "2025-11-20",
+    segundaFechaVencimiento = "2025-12-31",
+    checkoutUrl = "https://ejemplo.com",
+    emailPagador = "email@pagador"
 )

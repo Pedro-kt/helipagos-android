@@ -42,8 +42,11 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.pedro.helipagospayment.common.ui.components.Loader
 import com.pedro.helipagospayment.common.ui.components.PaymentItemCard
+import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentPagedDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
+import com.pedro.helipagospayment.features.paymentrequests.domain.model.PaymentPaged
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -77,13 +80,11 @@ fun PaymentRequestsScreen(
         ) {
             when {
                 isLoading && isEmpty && !hasLoadedOnce.value -> {
-                    LoadingState()
+                    Loader()
                 }
 
                 isError && !isManualRefreshing -> {
-                    val error = (paymentsLazyPagingItems.loadState.refresh as LoadState.Error).error
                     ErrorState(
-                        message = error.message ?: "Error al cargar",
                         onRetry = {
                             isManualRefreshing = true
                             paymentsLazyPagingItems.retry()
@@ -117,7 +118,7 @@ fun PaymentRequestsScreen(
 
 @Composable
 private fun PaymentList(
-    paymentsLazyPagingItems: LazyPagingItems<PaymentResponseDto>,
+    paymentsLazyPagingItems: LazyPagingItems<PaymentPaged>,
     onPaymentClick: (Int) -> Unit
 ) {
     LazyColumn(
@@ -201,31 +202,7 @@ private fun PaymentList(
 }
 
 @Composable
-private fun LoadingState() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.size(48.dp),
-                color = MaterialTheme.colorScheme.primary
-            )
-            Text(
-                text = "Cargando solicitudes...",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
-
-@Composable
 private fun ErrorState(
-    message: String,
     onRetry: () -> Unit
 ) {
     Box(

@@ -6,6 +6,7 @@ import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaym
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentResponseDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
 import com.pedro.helipagospayment.features.paymentrequests.data.repository.PaymentRepositoryImpl
+import com.pedro.helipagospayment.features.paymentrequests.domain.model.PaymentPaged
 import com.pedro.helipagospayment.features.paymentrequests.domain.repository.PaymentRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -165,7 +166,7 @@ class PaymentRepositoryImplTest {
         val pagingDataFlow = repository.getPaymentsPaged()
 
         assertNotNull(pagingDataFlow)
-        assertTrue(pagingDataFlow is Flow<PagingData<PaymentResponseDto>>)
+        assertTrue(pagingDataFlow is Flow<PagingData<PaymentPaged>>)
     }
 
     private fun createFakePayment(id: Int) = PaymentResponseDto(
