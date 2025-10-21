@@ -1,4 +1,4 @@
-# Prueba Tecnica Helipagos- Android
+# Prueba Tecnica Helipagos - Android
 
 Este repositorio es parte de una Prueba Tecnica para la postulacion del puesto de Desarrollador Mobile en Helipagos,
 La aplicacion consume la API de helipagos en entorno Sandbox, para manejar solicitudes de pagos.
@@ -94,12 +94,12 @@ La aplicación implementa **MVVM (Model-View-ViewModel)** con **Clean Architectu
                  │
 ┌────────────────▼────────────────────────────────┐
 │                  Domain                         │
-│     (Use Cases, Repository Interfaz)          │
+│     (Use Cases, Repository Interfaz, Models)          │
 └────────────────┬────────────────────────────────┘
                  │
 ┌────────────────▼────────────────────────────────┐
 │                   Data                          │
-│  (Repository Impl, API Service, DTOs, Paging)   │
+│  (Repository Impl, API Service, DTOs, Paging, Mapper)   │
 └─────────────────────────────────────────────────┘
 ```
 
@@ -120,6 +120,7 @@ La aplicación implementa **MVVM (Model-View-ViewModel)** con **Clean Architectu
 - **Remote Data Source**: API calls con Retrofit
 - **DTOs**: Data Transfer Objects para la API
 - **Paging**: Paginación
+- **Mapper**: Mapeo de DTOs -> Domain
 
 ### Flujo de Datos
 ```
@@ -294,7 +295,7 @@ fun provideRetrofit(): Retrofit {
   - Colores adaptativos del sistema
   - Dynamic theming en Android 12+
 
-- [x] **ULTRA-002**: uso de flatMapLatest para cancelacion de Flow
+- [x] **ULTRA-002**: uso de flatMapLatest para cancelacion de Flow en CreatePaymentViewModel
 
 ### Otras Mejoras
 
@@ -319,12 +320,19 @@ app/
 
 #### Tests Unitarios (JVM)
 ```bash
+# Ejecutar todos los tests unitarios
 ./gradlew test
-```
 
-#### Tests Unitarios con Coverage
-```bash
-./gradlew testDebugUnitTestCoverage
+# Solo tests de debug
+./gradlew testDebugUnitTest
+
+Tests con Coverage (JaCoCo)
+
+# Primero configura JaCoCo en build.gradle.kts (ver documentación)
+# Luego ejecuta:
+./gradlew testDebugUnitTest jacocoTestReport
+
+# Reporte HTML en: app/build/reports/jacoco/jacocoTestReport/html/index.html
 ```
 
 ---
@@ -429,7 +437,7 @@ app/
 │   │   │   │           ├── PaymentListCard.kt
 │   │   │   │           └── TopAppBarComponent.kt
 │   │   │   │
-│   │   │   ├── core/   
+│   │   │   ├── core/                             # core
 │   │   │   │   └── network/
 │   │   │   │       └── AuthInterceptor.kt
 │   │   │   │
@@ -447,16 +455,22 @@ app/
 │   │   │   │       │   │   └── PaymentsPagedResponseDto.kt
 │   │   │   │       │   ├── paging/
 │   │   │   │       │   │   └── PaymentPagingSource.kt
-│   │   │   │       │   └── repository/
-│   │   │   │       │       └── PaymentRepositoryImpl.kt
+│   │   │   │       │   ├── repository/
+│   │   │   │       │   │    └── PaymentRepositoryImpl.kt
+│   │   │   │       │   └── mapper/
+│   │   │   │       │        ├── PagedDtoToPagedModel.kt
+│   │   │   │       │        └── PaymentDtoToPaymentModel.kt
 │   │   │   │       │
 │   │   │   │       ├── domain/                  # Domain Layer
 │   │   │   │       │   ├── usecases/
 │   │   │   │       │   │   ├── CreatePaymentUseCase.kt
 │   │   │   │       │   │   ├── GetPaymentDetailUseCase.kt
 │   │   │   │       │   │   └── GetPaymentsPagedUseCase.kt
-│   │   │   │       │   └── repository/
-│   │   │   │       │       └── PaymentRepository.kt
+│   │   │   │       │   ├── repository/
+│   │   │   │       │   │    └── PaymentRepository.kt
+│   │   │   │       │   └── model/
+│   │   │   │       │        ├── PaynentPaged.kt
+│   │   │   │       │        └── PaymentResponse.kt
 │   │   │   │       │
 │   │   │   │       └── ui/                  # Presentation Layer
 │   │   │   │           ├── create/
