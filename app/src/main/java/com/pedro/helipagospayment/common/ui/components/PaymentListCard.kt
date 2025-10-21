@@ -30,12 +30,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
+import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentPagedDto
+import com.pedro.helipagospayment.features.paymentrequests.domain.model.PaymentPaged
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PaymentItemCard(
-    payment: PaymentResponseDto,
+    payment: PaymentPaged,
     onClick: () -> Unit,
 ) {
     ElevatedCard(
@@ -56,19 +57,21 @@ fun PaymentItemCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.Top
             ) {
-                Text(
-                    text = payment.descripcion,
-                    style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(end = 12.dp),
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
+                payment.descripcion?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 12.dp),
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                }
 
                 Text(
-                    text = "$${"%.2f".format(payment.importe)}",
+                    text = "$${payment.importePagado}",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary
@@ -132,11 +135,13 @@ fun PaymentItemCard(
                     modifier = Modifier.size(16.dp),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Text(
-                    text = payment.fechaPago ?: payment.fechaCreacion,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                (payment.fechaPago ?: payment.fechaCreacion)?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
             }
         }
     }

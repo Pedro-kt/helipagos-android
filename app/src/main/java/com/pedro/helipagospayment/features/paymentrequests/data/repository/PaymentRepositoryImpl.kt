@@ -10,13 +10,15 @@ import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentRes
 import kotlinx.coroutines.flow.Flow
 import com.pedro.helipagospayment.features.paymentrequests.data.api.PaymentApi
 import com.pedro.helipagospayment.features.paymentrequests.data.paging.PaymentPagingSource
+import com.pedro.helipagospayment.features.paymentrequests.domain.model.PaymentPaged
+import com.pedro.helipagospayment.features.paymentrequests.domain.repository.PaymentRepository
 import javax.inject.Inject
 
 class PaymentRepositoryImpl @Inject constructor(
     private val api: PaymentApi
 ) : PaymentRepository {
 
-    override fun getPaymentsPaged(): Flow<PagingData<PaymentResponseDto>> {
+    override fun getPaymentsPaged(): Flow<PagingData<PaymentPaged>> {
         return Pager(
             config = PagingConfig(
                 pageSize = 20,

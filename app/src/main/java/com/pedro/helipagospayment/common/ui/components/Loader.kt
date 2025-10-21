@@ -25,7 +25,7 @@ fun Loader() {
             CircularProgressIndicator()
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Cargando"
+                text = "Cargando..."
             )
         }
     }

@@ -54,9 +54,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
+import com.pedro.helipagospayment.features.paymentrequests.domain.model.PaymentResponse
 
 @Composable
-fun PaymentDetailContent(payment: PaymentResponseDto) {
+fun PaymentDetailContent(payment: PaymentResponse) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(16.dp),
@@ -338,7 +339,7 @@ fun PaymentDetailContent(payment: PaymentResponseDto) {
 }
 
 @Composable
-private fun PaymentDetailHeader(payment: PaymentResponseDto) {
+private fun PaymentDetailHeader(payment: PaymentResponse) {
     ElevatedCard(
         modifier = Modifier.fillMaxWidth(),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 4.dp)

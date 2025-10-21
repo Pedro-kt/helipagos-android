@@ -1,8 +1,8 @@
 package com.pedro.helipagospayment.di
 
 import com.pedro.helipagospayment.features.paymentrequests.data.api.PaymentApi
-import com.pedro.helipagospayment.features.paymentrequests.data.repository.PaymentRepository
 import com.pedro.helipagospayment.features.paymentrequests.data.repository.PaymentRepositoryImpl
+import com.pedro.helipagospayment.features.paymentrequests.domain.repository.PaymentRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

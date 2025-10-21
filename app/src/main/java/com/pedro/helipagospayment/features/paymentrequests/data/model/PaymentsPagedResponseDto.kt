@@ -5,7 +5,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class PaymentsPagedResponseDto(
-    @SerialName("content") val content: List<PaymentResponseDto>,
+    @SerialName("content") val content: List<PaymentPagedDto>,
     @SerialName("pageable") val pageable: PageableDto,
     @SerialName("totalPages") val totalPages: Int,
     @SerialName("totalElements") val totalElements: Int,

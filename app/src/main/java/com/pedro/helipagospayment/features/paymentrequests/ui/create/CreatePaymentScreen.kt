@@ -45,17 +45,16 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
@@ -65,7 +64,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.pedro.helipagospayment.common.ui.components.Loader
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentRequestDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentResponseDto
 import com.pedro.helipagospayment.navigation.Destinations
@@ -84,10 +82,16 @@ fun CreatePaymentScreen(
     var referencia by remember { mutableStateOf("") }
     var fechaVto by remember { mutableStateOf("") }
 
-    // Validacion del formulario
-    val isFormValid = (importe.toIntOrNull() ?: 0) >= 10000 &&
-            descripcion.length >= 5 &&
-            referencia.isNotEmpty()
+    val isFormValid by remember {
+        derivedStateOf {
+            val importeValido = (importe.toIntOrNull() ?: 0) >= 10000
+            val descripcionValida = descripcion.length >= 5
+            val referenciaValida = referencia.isNotEmpty()
+
+            importeValido && descripcionValida && referenciaValida
+        }
+    }
+
 
     LazyColumn(
         modifier = Modifier
@@ -550,8 +554,8 @@ private fun CreatePaymentForm(
                     supportingText = {
                         Text(
                             text = if (fechaVto.isEmpty())
-                                "Si no especifica, se usará: 31/12/2025"
-                            else "Formato: AAAA-MM-DD",
+                                "Si no especifica, se usará: 2025/12/31"
+                            else "Formato: AAAA-DD-MM",
                             style = MaterialTheme.typography.bodySmall
                         )
                     },

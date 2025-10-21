@@ -4,11 +4,14 @@ import androidx.paging.PagingConfig
 import androidx.paging.PagingSource
 import androidx.paging.PagingState
 import com.pedro.helipagospayment.features.paymentrequests.data.api.PaymentApi
+import com.pedro.helipagospayment.features.paymentrequests.data.mapper.toPaymentPaged
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PageableDto
+import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentPagedDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentsPagedResponseDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.SortDto
 import com.pedro.helipagospayment.features.paymentrequests.data.paging.PaymentPagingSource
+import com.pedro.helipagospayment.features.paymentrequests.domain.model.PaymentPaged
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -33,7 +36,7 @@ class PaymentPagingSourceTest {
 
     @Test
     fun `load devuelve primera pagina correctamente`() = runTest {
-        // Given
+
         val mockResponse = createMockPagedResponse(
             page = 0,
             pageSize = 20,
@@ -42,7 +45,6 @@ class PaymentPagingSourceTest {
         )
         coEvery { api.getPaymentsPaged(0, 20) } returns mockResponse
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Refresh(
                 key = null,
@@ -51,18 +53,17 @@ class PaymentPagingSourceTest {
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Page)
         val page = result as PagingSource.LoadResult.Page
         assertEquals(20, page.data.size)
-        assertEquals(1, page.data.first().idSp)
+        assertEquals(0, page.data.first().idSp)
         assertNull(page.prevKey)
         assertEquals(1, page.nextKey)
     }
 
     @Test
     fun `load devuelve segunda pagina correctamente`() = runTest {
-        // Given
+
         val mockResponse = createMockPagedResponse(
             page = 1,
             pageSize = 20,
@@ -71,7 +72,6 @@ class PaymentPagingSourceTest {
         )
         coEvery { api.getPaymentsPaged(1, 20) } returns mockResponse
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Append(
                 key = 1,
@@ -80,7 +80,6 @@ class PaymentPagingSourceTest {
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Page)
         val page = result as PagingSource.LoadResult.Page
         assertEquals(20, page.data.size)
@@ -90,7 +89,7 @@ class PaymentPagingSourceTest {
 
     @Test
     fun `load devuelve ultima pagina sin nextKey`() = runTest {
-        // Given
+
         val mockResponse = createMockPagedResponse(
             page = 4,
             pageSize = 20,
@@ -99,7 +98,6 @@ class PaymentPagingSourceTest {
         )
         coEvery { api.getPaymentsPaged(4, 20) } returns mockResponse
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Append(
                 key = 4,
@@ -108,21 +106,19 @@ class PaymentPagingSourceTest {
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Page)
         val page = result as PagingSource.LoadResult.Page
         assertEquals(20, page.data.size)
         assertEquals(3, page.prevKey)
-        assertNull(page.nextKey) // Última página
+        assertNull(page.nextKey)
     }
 
     @Test
     fun `load devuelve error cuando API falla`() = runTest {
-        // Given
+
         val exception = Exception("Network error")
         coEvery { api.getPaymentsPaged(any(), any()) } throws exception
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Refresh(
                 key = null,
@@ -131,7 +127,6 @@ class PaymentPagingSourceTest {
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Error)
         val error = result as PagingSource.LoadResult.Error
         assertEquals("Network error", error.throwable.message)
@@ -139,7 +134,7 @@ class PaymentPagingSourceTest {
 
     @Test
     fun `load maneja correctamente pagina 0 cuando key es null`() = runTest {
-        // Given
+
         val mockResponse = createMockPagedResponse(
             page = 0,
             pageSize = 20,
@@ -148,16 +143,14 @@ class PaymentPagingSourceTest {
         )
         coEvery { api.getPaymentsPaged(0, 20) } returns mockResponse
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Refresh(
-                key = null, // Primera carga
+                key = null,
                 loadSize = 20,
                 placeholdersEnabled = false
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Page)
         val page = result as PagingSource.LoadResult.Page
         assertNull(page.prevKey)
@@ -167,7 +160,7 @@ class PaymentPagingSourceTest {
 
     @Test
     fun `getRefreshKey retorna clave correcta basada en anchor position`() = runTest {
-        // Given
+
         val mockPages = listOf(
             PagingSource.LoadResult.Page(
                 data = createMockPayments(0, 20),
@@ -175,39 +168,39 @@ class PaymentPagingSourceTest {
                 nextKey = 1
             )
         )
-        val pagingState = PagingState(
-            pages = mockPages,
-            anchorPosition = 10, // Posición en medio de la primera página
+        val pagingState = PagingState<Int, PaymentPaged>(
+            pages = listOf(
+                PagingSource.LoadResult.Page(
+                    data = createMockPayments(0, 20).map { it.toPaymentPaged() },
+                    prevKey = null,
+                    nextKey = 1
+                )
+            ),
+            anchorPosition = 10,
             config = PagingConfig(pageSize = 20),
             leadingPlaceholderCount = 0
         )
 
-        // When
+
         val refreshKey = pagingSource.getRefreshKey(pagingState)
 
-        // Then
-        // Debería retornar 0 (página actual) ya que anchorPosition está en la primera página
         assertEquals(0, refreshKey)
     }
 
     @Test
     fun `getRefreshKey retorna null cuando anchorPosition es null`() = runTest {
-        // Given
-        val pagingState = PagingState<Int, PaymentResponseDto>(
+
+        val pagingState = PagingState<Int, PaymentPaged>(
             pages = emptyList(),
             anchorPosition = null,
             config = PagingConfig(pageSize = 20),
             leadingPlaceholderCount = 0
         )
 
-        // When
         val refreshKey = pagingSource.getRefreshKey(pagingState)
 
-        // Then
         assertNull(refreshKey)
     }
-
-    // Helpers
 
     private fun createMockPagedResponse(
         page: Int,
@@ -239,28 +232,22 @@ class PaymentPagingSourceTest {
         )
     }
 
-    private fun createMockPayments(startId: Int, count: Int): List<PaymentResponseDto> {
+    private fun createMockPayments(startId: Int, count: Int): List<PaymentPagedDto> {
         return List(count) { index ->
-            PaymentResponseDto(
-                idSp = startId + index + 1,
-                descripcion = "Pago ${startId + index}",
-                estadoPago = "GENERADA",
-                importe = 100.0 * (index + 1),
-                medioPago = null,
-                fechaPago = null,
-                fechaCreacion = "2025-10-20",
-                fechaVencimiento = "2025-12-31",
-                referenciaExterna = "REF-${startId + index}",
-                codigoBarra = "123456789",
-                fechaAcreditacion = null,
-                referenciaExterna2 = null,
-                importeVencido = null,
-                cuotas = null,
-                fechaActualizacion = "2025-10-20",
-                segundaFechaVencimiento = null,
-                checkoutUrl = null,
-                emailPagador = null,
-                importePagado = null
+            PaymentPagedDto(
+                idSp = startId + index,
+                codigoBarra = "",
+                estadoPago = "",
+                medioPago = "",
+                descripcion = "",
+                importePagado = "",
+                referenciaExterna = "",
+                referenciaExternaTwo = "",
+                fechaCreacion = "",
+                fechaPago = "",
+                fechaContracargo = "",
+                fechaVencimiento = "",
+                segundaFechaVencimiento = "",
             )
         }
     }
