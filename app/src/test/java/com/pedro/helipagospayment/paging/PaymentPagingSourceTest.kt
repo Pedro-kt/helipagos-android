@@ -33,7 +33,7 @@ class PaymentPagingSourceTest {
 
     @Test
     fun `load devuelve primera pagina correctamente`() = runTest {
-        // Given
+
         val mockResponse = createMockPagedResponse(
             page = 0,
             pageSize = 20,
@@ -42,7 +42,6 @@ class PaymentPagingSourceTest {
         )
         coEvery { api.getPaymentsPaged(0, 20) } returns mockResponse
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Refresh(
                 key = null,
@@ -51,7 +50,6 @@ class PaymentPagingSourceTest {
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Page)
         val page = result as PagingSource.LoadResult.Page
         assertEquals(20, page.data.size)
@@ -62,7 +60,7 @@ class PaymentPagingSourceTest {
 
     @Test
     fun `load devuelve segunda pagina correctamente`() = runTest {
-        // Given
+
         val mockResponse = createMockPagedResponse(
             page = 1,
             pageSize = 20,
@@ -71,7 +69,6 @@ class PaymentPagingSourceTest {
         )
         coEvery { api.getPaymentsPaged(1, 20) } returns mockResponse
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Append(
                 key = 1,
@@ -80,7 +77,6 @@ class PaymentPagingSourceTest {
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Page)
         val page = result as PagingSource.LoadResult.Page
         assertEquals(20, page.data.size)
@@ -90,7 +86,7 @@ class PaymentPagingSourceTest {
 
     @Test
     fun `load devuelve ultima pagina sin nextKey`() = runTest {
-        // Given
+
         val mockResponse = createMockPagedResponse(
             page = 4,
             pageSize = 20,
@@ -99,7 +95,6 @@ class PaymentPagingSourceTest {
         )
         coEvery { api.getPaymentsPaged(4, 20) } returns mockResponse
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Append(
                 key = 4,
@@ -108,21 +103,19 @@ class PaymentPagingSourceTest {
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Page)
         val page = result as PagingSource.LoadResult.Page
         assertEquals(20, page.data.size)
         assertEquals(3, page.prevKey)
-        assertNull(page.nextKey) // Última página
+        assertNull(page.nextKey)
     }
 
     @Test
     fun `load devuelve error cuando API falla`() = runTest {
-        // Given
+
         val exception = Exception("Network error")
         coEvery { api.getPaymentsPaged(any(), any()) } throws exception
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Refresh(
                 key = null,
@@ -131,7 +124,6 @@ class PaymentPagingSourceTest {
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Error)
         val error = result as PagingSource.LoadResult.Error
         assertEquals("Network error", error.throwable.message)
@@ -139,7 +131,7 @@ class PaymentPagingSourceTest {
 
     @Test
     fun `load maneja correctamente pagina 0 cuando key es null`() = runTest {
-        // Given
+
         val mockResponse = createMockPagedResponse(
             page = 0,
             pageSize = 20,
@@ -148,16 +140,14 @@ class PaymentPagingSourceTest {
         )
         coEvery { api.getPaymentsPaged(0, 20) } returns mockResponse
 
-        // When
         val result = pagingSource.load(
             PagingSource.LoadParams.Refresh(
-                key = null, // Primera carga
+                key = null,
                 loadSize = 20,
                 placeholdersEnabled = false
             )
         )
 
-        // Then
         assertTrue(result is PagingSource.LoadResult.Page)
         val page = result as PagingSource.LoadResult.Page
         assertNull(page.prevKey)
@@ -167,7 +157,7 @@ class PaymentPagingSourceTest {
 
     @Test
     fun `getRefreshKey retorna clave correcta basada en anchor position`() = runTest {
-        // Given
+
         val mockPages = listOf(
             PagingSource.LoadResult.Page(
                 data = createMockPayments(0, 20),
@@ -177,22 +167,19 @@ class PaymentPagingSourceTest {
         )
         val pagingState = PagingState(
             pages = mockPages,
-            anchorPosition = 10, // Posición en medio de la primera página
+            anchorPosition = 10,
             config = PagingConfig(pageSize = 20),
             leadingPlaceholderCount = 0
         )
 
-        // When
         val refreshKey = pagingSource.getRefreshKey(pagingState)
 
-        // Then
-        // Debería retornar 0 (página actual) ya que anchorPosition está en la primera página
         assertEquals(0, refreshKey)
     }
 
     @Test
     fun `getRefreshKey retorna null cuando anchorPosition es null`() = runTest {
-        // Given
+
         val pagingState = PagingState<Int, PaymentResponseDto>(
             pages = emptyList(),
             anchorPosition = null,
@@ -200,14 +187,10 @@ class PaymentPagingSourceTest {
             leadingPlaceholderCount = 0
         )
 
-        // When
         val refreshKey = pagingSource.getRefreshKey(pagingState)
 
-        // Then
         assertNull(refreshKey)
     }
-
-    // Helpers
 
     private fun createMockPagedResponse(
         page: Int,

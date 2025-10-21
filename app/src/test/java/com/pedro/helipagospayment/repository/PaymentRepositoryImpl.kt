@@ -5,8 +5,8 @@ import com.pedro.helipagospayment.features.paymentrequests.data.api.PaymentApi
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentRequestDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentResponseDto
 import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentResponseDto
-import com.pedro.helipagospayment.features.paymentrequests.data.repository.PaymentRepository
 import com.pedro.helipagospayment.features.paymentrequests.data.repository.PaymentRepositoryImpl
+import com.pedro.helipagospayment.features.paymentrequests.domain.repository.PaymentRepository
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
@@ -35,19 +35,15 @@ class PaymentRepositoryImplTest {
         repository = PaymentRepositoryImpl(api)
     }
 
-    // Tests para getPaymentDetail
-
     @Test
     fun `getPaymentDetail devuelve resultado exitoso cuando hay datos`() = runTest {
-        // Given
+
         val paymentId = 679841
         val fakePayment = createFakePayment(paymentId)
         coEvery { api.getPaymentDetail(paymentId) } returns listOf(fakePayment)
 
-        // When
         val result = repository.getPaymentDetail(paymentId)
 
-        // Then
         assertTrue(result.isSuccess)
         result.onSuccess { payment ->
             assertEquals(paymentId, payment.idSp)
@@ -59,14 +55,12 @@ class PaymentRepositoryImplTest {
 
     @Test
     fun `getPaymentDetail devuelve error cuando lista esta vacia`() = runTest {
-        // Given
+
         val paymentId = 999999
         coEvery { api.getPaymentDetail(paymentId) } returns emptyList()
 
-        // When
         val result = repository.getPaymentDetail(paymentId)
 
-        // Then
         assertTrue(result.isFailure)
         result.onFailure { exception ->
             assertEquals("Payment not found", exception.message)
@@ -76,15 +70,13 @@ class PaymentRepositoryImplTest {
 
     @Test
     fun `getPaymentDetail devuelve error cuando API falla con excepcion`() = runTest {
-        // Given
+
         val paymentId = 1
         val exception = IOException("Network timeout")
         coEvery { api.getPaymentDetail(paymentId) } throws exception
 
-        // When
         val result = repository.getPaymentDetail(paymentId)
 
-        // Then
         assertTrue(result.isFailure)
         result.onFailure { error ->
             assertEquals("Network timeout", error.message)
@@ -93,11 +85,10 @@ class PaymentRepositoryImplTest {
         coVerify(exactly = 1) { api.getPaymentDetail(paymentId) }
     }
 
-    // Tests para createPayment
 
     @Test
     fun `createPayment devuelve resultado exitoso con todos los datos`() = runTest {
-        // Given
+
         val request = createFakeCreateRequest()
         val response = CreatePaymentResponseDto(
             idSp = 679842,
@@ -115,10 +106,8 @@ class PaymentRepositoryImplTest {
         )
         coEvery { api.createPayment(request) } returns response
 
-        // When
         val result = repository.createPayment(request)
 
-        // Then
         assertTrue(result.isSuccess)
         result.onSuccess { created ->
             assertEquals(679842, created.idSp)
@@ -133,7 +122,7 @@ class PaymentRepositoryImplTest {
 
     @Test
     fun `createPayment devuelve error cuando API retorna 400`() = runTest {
-        // Given
+
         val request = createFakeCreateRequest()
         val exception = HttpException(
             Response.error<Any>(
@@ -143,10 +132,8 @@ class PaymentRepositoryImplTest {
         )
         coEvery { api.createPayment(request) } throws exception
 
-        // When
         val result = repository.createPayment(request)
 
-        // Then
         assertTrue(result.isFailure)
         result.onFailure { error ->
             assertTrue(error is HttpException)
@@ -156,15 +143,13 @@ class PaymentRepositoryImplTest {
 
     @Test
     fun `createPayment devuelve error cuando hay problema de red`() = runTest {
-        // Given
+
         val request = createFakeCreateRequest()
         val exception = SocketTimeoutException("Connection timeout")
         coEvery { api.createPayment(request) } throws exception
 
-        // When
         val result = repository.createPayment(request)
 
-        // Then
         assertTrue(result.isFailure)
         result.onFailure { error ->
             assertTrue(error is SocketTimeoutException)
@@ -173,20 +158,15 @@ class PaymentRepositoryImplTest {
         coVerify(exactly = 1) { api.createPayment(request) }
     }
 
-    // Tests para getPaymentsPaged
 
     @Test
     fun `getPaymentsPaged devuelve Flow de PagingData correctamente`() = runTest {
-        // When
+
         val pagingDataFlow = repository.getPaymentsPaged()
 
-        // Then
         assertNotNull(pagingDataFlow)
-        // Verificamos que es un Flow válido
         assertTrue(pagingDataFlow is Flow<PagingData<PaymentResponseDto>>)
     }
-
-    // Helpers
 
     private fun createFakePayment(id: Int) = PaymentResponseDto(
         idSp = id,

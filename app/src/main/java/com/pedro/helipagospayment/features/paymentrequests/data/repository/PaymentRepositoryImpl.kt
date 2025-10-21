@@ -10,6 +10,7 @@ import com.pedro.helipagospayment.features.paymentrequests.data.model.PaymentRes
 import kotlinx.coroutines.flow.Flow
 import com.pedro.helipagospayment.features.paymentrequests.data.api.PaymentApi
 import com.pedro.helipagospayment.features.paymentrequests.data.paging.PaymentPagingSource
+import com.pedro.helipagospayment.features.paymentrequests.domain.repository.PaymentRepository
 import javax.inject.Inject
 
 class PaymentRepositoryImpl @Inject constructor(

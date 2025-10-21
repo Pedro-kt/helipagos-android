@@ -1,12 +1,10 @@
 package com.pedro.helipagospayment.navigation
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.pedro.helipagospayment.features.paymentrequests.ui.create.CreatePaymentScreen
 import com.pedro.helipagospayment.features.paymentrequests.ui.detail.PaymentDetailScreen

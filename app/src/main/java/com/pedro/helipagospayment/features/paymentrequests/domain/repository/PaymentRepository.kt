@@ -1,4 +1,4 @@
-package com.pedro.helipagospayment.features.paymentrequests.data.repository
+package com.pedro.helipagospayment.features.paymentrequests.domain.repository
 
 import androidx.paging.PagingData
 import com.pedro.helipagospayment.features.paymentrequests.data.model.CreatePaymentRequestDto
